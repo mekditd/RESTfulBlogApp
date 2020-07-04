@@ -1,4 +1,22 @@
-var express = require("express");
-bodyParser = require("body-parser");
-app = express();
+var express    = require("express");
+mongoose       = require("mongoose");
+bodyParser     = require("body-parser");
+app            = express();
 
+
+mongoose.connect("mongodb://localhost/restful_blog_app");
+app.set("view engine", "ejs");
+app.use(express.static("public"));
+app.use(bodyParser.urlencoded({extended: true}));
+
+
+
+// title
+// Image
+// body
+// created
+
+
+app.listen(3000, function(){
+    res.send("Server is listening on PORT: 3000");
+})
