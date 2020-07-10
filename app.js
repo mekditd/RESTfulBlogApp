@@ -1,23 +1,23 @@
-var express        = require("express"),
-    mongoose       = require("mongoose"),
-    bodyParser     = require("body-parser"),
-    app            = express();
+var express = require("express"),
+  mongoose = require("mongoose"),
+  bodyParser = require("body-parser"),
+  app = express();
 
-
-mongoose.connect("mongodb://localhost/restful_blog_app", { useNewUrlParser: true });
+mongoose.connect("mongodb://localhost/restful_blog_app", {
+  useNewUrlParser: true,
+});
 app.set("view engine", "ejs");
 app.use(express.static("public"));
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 var blogSchema = new mongoose.Schema({
-    title: String,
-    image: String,
-    body: String,
-    created: {type: Date, default: Date.now}
+  title: String,
+  image: String,
+  body: String,
+  created: { type: Date, default: Date.now },
 });
 
 var Blog = mongoose.model("Blog", blogSchema);
-
 
 // title
 // Image
@@ -32,21 +32,50 @@ var Blog = mongoose.model("Blog", blogSchema);
 
 // RESTful routes
 
-app.get("/", function(req, res){
-    res.redirect("/blog");
+app.get("/", function (req, res) {
+  res.redirect("/blogs");
 });
 
-app.get("/blogs", function(req, res){
-    Blog.find({}, function(err, blogs){
+// index route - lists all the blogs
+app.get("/blogs", function (req, res) {
+  Blog.find({}, function (err, blogs) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render("index", { blogs: blogs });
+    }
+  });
+});
+
+// New route
+app.get("/blogs/new", function (req, res) {
+  res.render("new");
+});
+
+//CREATE ROUTE
+app.post("/blogs", function (req, res) {
+  // create blog
+  Blog.create(req.body.blog, function (err, newBlog) {
+    if (err) {
+      console.log(err);
+      res.render("new");
+    } else {
+      res.redirect("/blogs");
+    }
+  });
+});
+
+// SHOW ROUTE
+app.get("/blogs/:id", function(req, res){
+    Blog.findById(req.params.id, function(err, foundBlog){
         if(err){
-            console.log(err);
+            res.redirect("/blogs");
         } else {
-            res.render("index", {blogs: blogs});
+            res.render("show", {blog: foundBlog});
         }
     })
 })
 
-
-app.listen(3000, function(){
-    console.log("Server is listening on PORT: 3000");
-})
+app.listen(3000, function () {
+  console.log("Server is listening on PORT: 3000");
+});
